@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Sentiment Analysis</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "bootstrap.min.css" %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+   
+    <style>
+	textarea.form-control	 {
+    	   
+        margin: 0px -65px 0px 0px;
+        height: 250px;
+        width: 1000px; 	
+        background: transparent;
+        font-size: 30px;
+        text-align: center;
+	}
+    </style>
+  </head>
+
+  <body>
+  
+  <nav class="navbar navbar-expand-sm bg-info navbar-dark">
+  <!-- Brand/logo -->
+  <a class="navbar-brand" href="{% url 'welcome' %}"><img src="{% static '2.jpg' %}" class="rounded-circle" width="90px" height="50px"></a>
+  
+  <!-- Links -->
+ 
+      <a class="nav-link" href="{% url 'welcome' %}"><h2 class="text-light"><b>Sentiment Analysis<b></h2></a>
+	 
+	  <br>
+	  
+
+</nav>
+ 
+
+    <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="masthead clearfix" style="position:static;">
+            <div class="inner">
+			<div class="row">
+			<div class="col-sm-2">
+			</div>
+              <div class="col-sm-8">
+			
+              <nav>
+			  
+                 <div class="progress-bar  progress-bar-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:{{x}}%">
+      {{x}}%
+    </div>
+	<div class="progress-bar  progress-bar-danger" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:{{y}}%">
+      {{y}}%
+    </div>
+	</div>
+	
+              </nav>
+            </div>
+          </div>
+         <center> <div class="inner cover">
+            <h1 class="cover-heading">Enter Review Text</h1>
+	    <textarea class="form-control form-rounded " rows="2"></textarea>
+	    <div class="row">
+            <p class="lead" style="padding-top:10px" id="process">
+              <a href="javascript:void(0)" class="btn btn-lg btn-info">Process the text</a>
+            </p>
+	    <p class="lead" style="padding-top:10px; display:none" id="success">
+              <a href="#" class="btn btn-lg btn-success">Positive</a>
+            </p>
+	    <p class="lead" style="padding-top:10px; display:none" id="danger">
+              <a href="#" class="btn btn-lg btn-danger">Negative</a>
+            </p>
+	 
+	   <p class="lead" style="padding-top:10px" id="clear">
+              <a href="javascript:void(0)" class="btn btn-lg btn-default">Clear</a>
+				</p>
+		
+        
+	</div></center>
+	<center> <a href="{% url 'registration' %}" class="btn btn-danger" role="button">Logout</a></center>
+	
+          </div>
+		  <br>
+		  <br>
+		  <div class="row">
+		  <div class="col-sm-2">
+		  </div>
+		  <div class="col-sm-10">
+		  {% for a in data%}
+		  {% if a.reviewtypes == 'positive' %}
+		  
+		  
+		  <p class="text-capitalize"><b>{{a.user}}</b>
+		  
+		 <span class="label label-success">{{a.reviewtypes}}</span></p>
+		 <p class="text-muted">{{a.date}}</p>
+		  <p>{{a.review}}</p>
+		 {% else %}
+		  <p class="text-capitalize"><b>{{a.user}}</b>
+		 <span class="label label-danger">{{a.reviewtypes}}</span></p>
+		  <p class="text-muted">{{a.date}}</p>
+		  <p>{{a.review}}</p>
+		 
+		  
+		  {% endif %}
+		 
+		  <hr>
+		  {% endfor %}
+		  
+		  
+	
+</div>
+
+		  </div>
+
+		  </div>
+		  
+          <div class="mastfoot" style="position:static">
+            <div class="inner">
+           
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="{% static "bootstrap.min.js" %}"></script>i
+    	<script>
+		$('#process').on('click', function() {
+        	var para = $('textarea').val();
+		console.log('para', para)
+        	$.ajax({
+        		url: '/home/process_word',
+        		data: {
+				review: para,
+				csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+			},
+        		type: 'POST',
+			beforeSend: function() {
+	  			$("body").css("cursor", "progress");
+			},
+			complete:function(){
+	  			$("body").css("cursor", "default");
+			},
+        		success:function(data){
+				console.log('success', data)
+				if (data === 'True') {
+				    $('#success').show();
+				    $('#process').hide();	
+				} else {
+				    $('#danger').show();
+				    $('#process').hide(); 		
+				}
+         		}
+      		});
+      		});
+		$('#clear').on('click', function(){
+			$('#success').hide();
+			$('#danger').hide();
+			$('#process').show();
+			$('textarea').val('');
+		});
+	</script>
+  </body>
+</html>
